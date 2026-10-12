@@ -1,0 +1,28 @@
+{
+  "name": "Example Game",
+  "link": "https://example.com/play/example-game",
+  "tagline": "One-line hook shown on the card.",
+  "description": "Full description shown on the game page.\n\nBlank lines start a new paragraph.",
+  "categories": ["Puzzle", "Casual"],
+  "platforms": ["desktop", "mobile"],
+  "orientation": "Landscape",
+  "controls": ["Mouse", "Touch"],
+  "engine": "Unity",
+  "status": "Released",
+  "released": "2026-09",
+  "version": "1.2.0",
+  "size": "8 MB",
+  "languages": ["English"],
+  "details": { "Avg. session": "6 min", "Ads": "None (ready for Poki SDK)" },
+  "notes": [
+    "Poki SDK already integrated (gameplayStart / gameplayStop / commercialBreak).",
+    "No external requests, so it works offline after first load."
+  ],
+  "links": [
+    { "label": "Trailer", "url": "https://youtube.com/watch?v=..." },
+    { "label": "itch.io page", "url": "https://example.itch.io/example-game" }
+  ],
+  "screenshots": [],
+  "embed": false,
+  "order": 1
+}
