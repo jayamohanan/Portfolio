@@ -240,8 +240,18 @@ function indexPage(site, games) {
       ${links.map((l) => `<a class="btn btn-ghost btn-sm" href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener">${esc(l.label || l.url)}</a>`).join("\n      ")}
       ${
         site.email
-          ? `<a class="btn btn-play btn-sm" href="mailto:${esc(site.email)}" aria-label="Contact me">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zm1 2.4V17h16V7.4l-8 5.3-8-5.3zM5.6 7l6.4 4.3L18.4 7H5.6z"/></svg><span class="hide-sm">Contact</span></a>`
+          ? `<div class="contact">
+        <button type="button" class="btn btn-play btn-sm" aria-expanded="false" aria-controls="contact-pop" aria-label="Contact me">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zm1 2.4V17h16V7.4l-8 5.3-8-5.3zM5.6 7l6.4 4.3L18.4 7H5.6z"/></svg><span class="hide-sm">Contact</span></button>
+        <div class="contact-pop" id="contact-pop" hidden>
+          <p class="contact-label">Email me at</p>
+          <p class="contact-email">${esc(site.email)}</p>
+          <div class="contact-actions">
+            <button type="button" class="btn btn-play btn-sm" data-copy="${esc(site.email)}">Copy</button>
+            <a class="btn btn-ghost btn-sm" href="mailto:${esc(site.email)}">Open mail app</a>
+          </div>
+        </div>
+      </div>`
           : ""
       }
     </nav>

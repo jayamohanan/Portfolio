@@ -51,3 +51,16 @@ document.querySelectorAll(".embed").forEach((box) => {
     box.replaceChildren(frame);
   });
 });
+
+// Contact popover: shows the email with Copy / Open mail app.
+document.querySelectorAll(".contact").forEach((box) => {
+  const toggle = box.querySelector("[aria-expanded]");
+  const pop = box.querySelector(".contact-pop");
+  const setOpen = (open) => {
+    pop.hidden = !open;
+    toggle.setAttribute("aria-expanded", open);
+  };
+  toggle.addEventListener("click", () => setOpen(pop.hidden));
+  document.addEventListener("click", (e) => !box.contains(e.target) && setOpen(false));
+  document.addEventListener("keydown", (e) => e.key === "Escape" && setOpen(false));
+});
