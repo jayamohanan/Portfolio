@@ -104,7 +104,10 @@ function loadGames() {
     if (!thumbnail) warn(`games/${entry.name}: no thumbnail image found`);
 
     if (!data.name) warn(`games/${entry.name}: missing "name"`);
-    if (!safeUrl(data.link)) warn(`games/${entry.name}: missing or invalid "link"`);
+    const stores = toArray(data.store)
+      .map((st) => ({ label: st?.label || "Store", url: safeUrl(st?.url) }))
+      .filter((st) => st.url);
+    if (!safeUrl(data.link) && !stores.length) warn(`games/${entry.name}: missing "link" (or "store")`);
 
     let slug = slugify(data.slug || entry.name.replace(/^_/, ""));
     while (usedSlugs.has(slug)) slug += "-2";
@@ -118,6 +121,7 @@ function loadGames() {
       slug,
       name: data.name || entry.name,
       link: safeUrl(data.link),
+      stores,
       categories: toArray(data.categories).map(String),
       platforms: toArray(data.platforms),
       screenshots,
@@ -167,6 +171,7 @@ ${ogImage ? `<meta property="og:image" content="${esc(ogImage)}">\n<meta name="t
 <body>
 ${body}
 <footer class="site-footer"><div class="wrap">
+  ${site.about ? `<div class="footer-about">${paragraphs(site.about)}</div>` : ""}
   <span>© ${new Date().getFullYear()} ${esc(site.name || "")}</span>
   ${site.email ? `<a href="mailto:${esc(site.email)}">${esc(site.email)}</a>` : ""}
 </div></footer>
@@ -179,23 +184,28 @@ ${body}
 const tagList = (cats, cls = "tags") =>
   cats.length ? `<ul class="${cls}">${cats.map((c) => `<li>${esc(c)}</li>`).join("")}</ul>` : "";
 
-const playButton = (game, extraClass = "") =>
-  game.link
-    ? `<a class="btn btn-play ${extraClass}" href="${esc(game.link)}" target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Play</a>`
-    : `<span class="btn btn-disabled">Coming soon</span>`;
+const storeButton = (st, cls) =>
+  `<a class="btn ${cls}" href="${esc(st.url)}" target="_blank" rel="noopener">${esc(st.label)} ↗</a>`;
+
+// Primary action: web Play link if there is one, otherwise the first store link.
+// With all = true (game page), every store link is added as a secondary button.
+const playButton = (game, extraClass = "", all = false) => {
+  const stores = all ? game.stores : game.link ? [] : game.stores.slice(0, 1);
+  const buttons = stores.map((st, i) => storeButton(st, `${!game.link && i === 0 ? "btn-play" : "btn-ghost"} ${extraClass}`));
+  if (game.link) {
+    buttons.unshift(`<a class="btn btn-play ${extraClass}" href="${esc(game.link)}" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z"/></svg>Play</a>`);
+  }
+  return buttons.join("\n") || `<span class="btn btn-disabled">Coming soon</span>`;
+};
 
 function card(game) {
   const href = `games/${game.slug}/`;
-  const searchText = [game.name, game.tagline, firstParagraph(game.description), ...game.categories, ...toArray(game.tags), game.engine]
-    .filter(Boolean)
-    .join(" ")
-    .toLowerCase();
   const thumb = game.thumbnail
     ? `<img src="${esc(assetUrl(game, game.thumbnail))}" alt="${esc(game.name)}" loading="lazy">`
     : `<span class="thumb-fallback">${esc(game.name.slice(0, 1))}</span>`;
 
-  return `<li class="card" data-categories="${esc(game.categories.join("|").toLowerCase())}" data-search="${esc(searchText)}">
+  return `<li class="card" data-categories="${esc(game.categories.join("|").toLowerCase())}">
   <a class="card-thumb" href="${href}" tabindex="-1" aria-hidden="true">
     ${thumb}
     ${game.status ? `<span class="badge badge-status">${esc(game.status)}</span>` : ""}
@@ -217,26 +227,24 @@ function indexPage(site, games) {
   const counts = new Map();
   for (const g of games) for (const c of g.categories) counts.set(c, (counts.get(c) || 0) + 1);
   const categories = [...counts].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
-  const mobileReady = games.filter((g) => g.platforms.some((p) => /mobile|tablet/i.test(p))).length;
   const links = toArray(site.links).filter((l) => safeUrl(l?.url));
 
   const body = `
-<header class="hero">
-  <div class="wrap">
-    <p class="eyebrow">Game portfolio</p>
-    <h1>${esc(site.name || "My Games")}</h1>
-    ${site.tagline ? `<p class="tagline">${esc(site.tagline)}</p>` : ""}
-    ${site.about ? `<div class="about">${paragraphs(site.about)}</div>` : ""}
-    <div class="hero-links">
-      ${site.email ? `<a class="btn btn-play" href="mailto:${esc(site.email)}">Contact me</a>` : ""}
-      ${links.map((l) => `<a class="btn btn-ghost" href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener">${esc(l.label || l.url)}</a>`).join("\n      ")}
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <div class="brand">
+      <h1>${esc(site.name || "My Games")}</h1>
+      ${site.tagline ? `<p class="tagline">${esc(site.tagline)}</p>` : ""}
     </div>
-    <dl class="stats">
-      <div><dt>Games</dt><dd>${games.length}</dd></div>
-      <div><dt>Playable now</dt><dd>${games.filter((g) => g.link).length}</dd></div>
-      ${mobileReady ? `<div><dt>Mobile ready</dt><dd>${mobileReady}</dd></div>` : ""}
-      ${categories.length ? `<div><dt>Genres</dt><dd>${categories.length}</dd></div>` : ""}
-    </dl>
+    <nav class="top-links">
+      ${links.map((l) => `<a class="btn btn-ghost btn-sm" href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener">${esc(l.label || l.url)}</a>`).join("\n      ")}
+      ${
+        site.email
+          ? `<a class="btn btn-play btn-sm" href="mailto:${esc(site.email)}" aria-label="Contact me">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zm1 2.4V17h16V7.4l-8 5.3-8-5.3zM5.6 7l6.4 4.3L18.4 7H5.6z"/></svg><span class="hide-sm">Contact</span></a>`
+          : ""
+      }
+    </nav>
   </div>
 </header>
 
@@ -244,10 +252,6 @@ function indexPage(site, games) {
   ${
     games.length
       ? `<div class="toolbar">
-    <label class="search">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.5 3a7.5 7.5 0 0 1 5.9 12.1l4.2 4.2-1.4 1.4-4.2-4.2A7.5 7.5 0 1 1 10.5 3zm0 2a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11z"/></svg>
-      <input type="search" id="search" placeholder="Search games" aria-label="Search games">
-    </label>
     ${
       categories.length
         ? `<div class="chips" role="group" aria-label="Filter by category">
@@ -284,6 +288,7 @@ function gamePage(site, game, games) {
     ["Platforms", game.platforms.map(platformLabel).join(", ")],
     ["Orientation", game.orientation],
     ["Controls", toArray(game.controls).join(", ")],
+    ["Publisher", game.publisher],
     ["Engine", game.engine],
     ["Released", game.released],
     ["Version", game.version],
@@ -311,7 +316,7 @@ function gamePage(site, game, games) {
       ${game.tagline ? `<p class="tagline">${esc(game.tagline)}</p>` : ""}
       ${tagList(game.categories)}
       <div class="detail-actions">
-        ${playButton(game, "btn-lg")}
+        ${playButton(game, "btn-lg", true)}
         ${game.link ? `<button type="button" class="btn btn-ghost btn-lg" data-copy="${esc(game.link)}">Copy game link</button>` : ""}
       </div>
       ${extraLinks.length ? `<div class="extra-links">${extraLinks.map((l) => `<a href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener">${esc(l.label || l.url)} ↗</a>`).join("")}</div>` : ""}

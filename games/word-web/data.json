@@ -1,0 +1,20 @@
+{
+  "name": "Word Web!",
+  "link": "",
+  "store": [
+    {
+      "label": "Google Play",
+      "url": "https://play.google.com/store/apps/details?id=com.Axis.WordWeb"
+    }
+  ],
+  "publisher": "Voodoo",
+  "description": "Put the words in the slots such that squares connected by line have same letters.",
+  "platforms": [
+    "mobile"
+  ],
+  "categories": [
+    "Hypercasual",
+    "Puzzle"
+  ],
+  "engine": "Unity"
+}

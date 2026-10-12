@@ -1,19 +1,17 @@
-// Search + category filter on the index page.
+// Category filter on the index page.
 (() => {
   const grid = document.getElementById("grid");
   if (!grid) return;
   const cards = [...grid.children];
-  const search = document.getElementById("search");
   const empty = document.getElementById("empty");
   const chips = [...document.querySelectorAll(".chip")];
   let category = "";
 
   const apply = () => {
-    const q = (search?.value || "").trim().toLowerCase();
     let shown = 0;
     for (const card of cards) {
       const cats = card.dataset.categories.split("|");
-      const ok = (!category || cats.includes(category)) && (!q || card.dataset.search.includes(q));
+      const ok = !category || cats.includes(category);
       card.hidden = !ok;
       if (ok) shown++;
     }
@@ -27,7 +25,6 @@
       apply();
     })
   );
-  search?.addEventListener("input", apply);
 })();
 
 // Copy-link buttons on game pages.

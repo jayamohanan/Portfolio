@@ -1,8 +1,15 @@
 {
   "name": "Merge Racer",
   "link": "https://cdf21e44.merge-racer.pages.dev",
-  "tagline": "Merge piggies, power up your cars, and race from #2000 to #1.",
-  "description": "A casual merge-and-race game built for web portals. Merge piggies on a 3×3 grid to power them up, then drop them into race lanes to drive your cars. Each piggy chips away at the rival's lead every second.\n\nBeat the rival in all three lanes to climb the leaderboard from #2000 to #1.\n\nBuilt with Phaser 3 and plain JavaScript, for Poki.",
-  "categories": ["Casual", "Merge", "Racing", "Idle / Incremental", "Hypercasual", "HTML5 / Web"],
+  "tagline": "Merge piggies, power up your cars, and race to #1.",
+  "description": "A casual merge-and-race game built for web portals. Merge piggies on a 3×3 grid to power them up, then drop them into race lanes to drive your cars. Each piggy chips away at the rival's lead every second.\n\nBeat the rival in all three lanes to climb the leaderboard to #1.\n\nBuilt with Phaser 3 and plain JavaScript, for Poki.",
+  "categories": [
+    "Casual",
+    "Merge",
+    "Racing",
+    "Idle / Incremental",
+    "Hypercasual",
+    "HTML5 / Web"
+  ],
   "engine": "Phaser 3"
 }
