@@ -1,6 +1,6 @@
 {
   "name": "Merge Racer",
-  "link": "https://d35356b7.merge-racer.pages.dev",
+  "link": "https://d77b5c81.merge-racer.pages.dev",
   "tagline": "Merge piggies, power up your cars, and race to #1.",
   "description": "A casual merge-and-race game built for web portals. Merge piggies on a 3×3 grid to power them up, then drop them into race lanes to drive your cars. Each piggy chips away at the rival's lead every second.\n\nBeat the rival in all three lanes to climb the leaderboard to #1.\n\nBuilt with Phaser 3 and plain JavaScript, for Poki.",
   "categories": [
