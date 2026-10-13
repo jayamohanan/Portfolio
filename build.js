@@ -233,8 +233,11 @@ function indexPage(site, games) {
 <header class="topbar">
   <div class="wrap topbar-inner">
     <div class="brand">
-      <h1>${esc(site.name || "My Games")}</h1>
-      ${site.tagline ? `<p class="tagline">${esc(site.tagline)}</p>` : ""}
+      ${site.photo ? `<img class="avatar" src="${esc(safeUrl(site.photo))}" alt="${esc(site.name || "")}" width="56" height="56">` : ""}
+      <div class="brand-text">
+        <h1>${esc(site.name || "My Games")}</h1>
+        ${site.tagline ? `<p class="tagline">${esc(site.tagline)}</p>` : ""}
+      </div>
     </div>
     <nav class="top-links">
       ${links.map((l) => `<a class="btn btn-ghost btn-sm" href="${esc(safeUrl(l.url))}" target="_blank" rel="noopener">${esc(l.label || l.url)}</a>`).join("\n      ")}
@@ -398,6 +401,17 @@ function build() {
   fs.mkdirSync(OUT_DIR, { recursive: true });
 
   for (const f of fs.readdirSync(SRC_DIR)) fs.copyFileSync(path.join(SRC_DIR, f), path.join(OUT_DIR, f));
+  if (site.photo) {
+    const src = path.join(ROOT, site.photo);
+    if (fs.existsSync(src) && IMAGE_EXT.test(src)) {
+      const out = path.join(OUT_DIR, site.photo);
+      fs.mkdirSync(path.dirname(out), { recursive: true });
+      fs.copyFileSync(src, out);
+    } else {
+      warn(`site.json: photo "${site.photo}" not found`);
+      delete site.photo;
+    }
+  }
   fs.writeFileSync(path.join(OUT_DIR, "index.html"), indexPage(site, games));
 
   for (const game of games) {
@@ -439,10 +453,10 @@ function watch() {
       }
     }, 200);
   };
-  for (const target of [GAMES_DIR, SRC_DIR, path.join(ROOT, "site.json")]) {
+  for (const target of [GAMES_DIR, SRC_DIR, path.join(ROOT, "site.json"), path.join(ROOT, "profile")]) {
     if (fs.existsSync(target)) fs.watch(target, { recursive: true }, (_, file) => !/\.DS_Store$/.test(file || "") && rebuild());
   }
-  console.log("→ Watching games/, src/ and site.json for changes");
+  console.log("→ Watching games/, src/, profile/ and site.json for changes");
 }
 
 build();

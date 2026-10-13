@@ -39,6 +39,7 @@ Only image files are published. `data.json` itself is never uploaded, so unknown
 ## Site settings
 
 Edit `site.json` to set your name, tagline, about text, email and links. Set `url` (e.g. `https://games.example.com`) to get full share previews (Open Graph images).
+`photo` (e.g. `"profile/picture.webp"`) shows a round profile photo next to your name; remove it to hide the photo.
 `thumbnailAspect` controls the card image shape (`"1 / 1"`, `"16 / 9"`, `"4 / 3"`).
 
 ## Deploy to Cloudflare Pages
